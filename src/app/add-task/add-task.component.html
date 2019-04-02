@@ -1,12 +1,65 @@
-<div class="Container">
+<div class="Container" style="padding-top:.5rem;">
     
-      <form  >
-         <div class="form-group row" style="padding:1rem;">
-           <label for="inputTask" class="control-label col-1" style="text-align: left">Task:</label>
-            <div class="col-6">
+      <form  #TaskForm="ngForm">
+         <div class="form-group row" style="padding-left:1rem;">
+           <label for="inputTask" class="control-label col-2" style="text-align: left">Task:</label>
+            <div class="col-5">
             <input type="text" class="form-control" id="inputTask" placeholder="TaskName">
             </div>
           </div>
+          <div class="form-group row" style="padding-left:1rem;">
+              <label for="inputPriority" class="control-label col-2" style="text-align: left">Priority:</label>
+               <div class="col-5">
+               
+               <input type="range" min="0" max="30" class="custom-range" value="0" id="inputPriority" oninput="ageOutputId.value = inputPriority.value">
+               
+               <output name="ageOutputName" id="ageOutputId">0</output>
+               </div>
+             </div>
+               <div class="form-group row" style="padding-left:1rem;">
+                  <label for="inputParent" class="control-label col-2" style="text-align: left">Parent Task:</label>
+                  <div class="col-5">
+                    <div class="input-group mb-3">
+                      <select class="custom-select" id="inputParent">
+                        <option selected>Choose...</option>
+                        
+                      </select>
+                      
+                    </div>
+                  </div>
+               </div>
+               <div class="form-group row" style="padding-left:1rem;">
+                <label for="startdate" class="control-label col-2" style="text-align: left">Start Date:</label>
+                <div class="col-5">
+                    
+                  <div class="input-group date" data-provide="datepicker">
+                    <input type="text" class="form-control" id="startdate" >
+                    <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-th"></span>
+                    </div>
+                  </div>
+                </div>
+               </div>
+               <div class="form-group row" style="padding-left:1rem;">
+                  <label for="enddate" class="control-label col-2" style="text-align: left">End Date:</label>
+                  <div class="col-5">
+                      
+                    <div class="input-group date" data-provide="datepicker">
+                      <input type="text" class="form-control" id="enddate" >
+                      <div class="input-group-addon">
+                          <span class="glyphicon glyphicon-th"></span>
+                      </div>
+                    </div>
+                  </div>
+                 </div>
+                 <div class="form-group row" style="padding-left:1rem;">
+                    <div class="col-1 offset-2 ">
+                        <button type="submit" class="btn btn-light">AddTask</button>
+                    </div>
+                    <div class="col-1 ">
+                        <button type="submit" class="btn btn-light">Reset</button>
+                    </div>
+                </div>
         </form>
     
   </div>

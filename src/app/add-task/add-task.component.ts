@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import{Task} from '../task'
 
 @Component({
   selector: 'app-add-task',
