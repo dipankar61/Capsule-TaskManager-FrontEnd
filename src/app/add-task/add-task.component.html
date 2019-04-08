@@ -3,6 +3,38 @@
       <form  #TaskForm="ngForm"    (ngSubmit)="onSubmit()" >
           
         <div ngModelGroup="model" name="modelgroup" #modelgroup="ngModelGroup"  appStartEndDateComparison> 
+            <div class="form-group row" style="padding-left:1rem;" *ngIf="isSuccess">
+                <div class="col-5 offset-2" >
+                    <div class="alert alert-Sucess" >
+                              {{successMsg}}
+                     </div>
+                     
+                  </div>
+            </div>
+            <div class="form-group row" style="padding-left:1rem;" *ngIf="isError">
+                <div class="col-5 offset-2" >
+                    <div class="alert alert-danger" >
+                              {{errorMsg}}
+                     </div>
+                     
+                  </div>
+            </div>
+            <div class="form-group row" style="padding-left:1rem;" *ngIf="isValidationStDateError">
+                <div class="col-5 offset-2" >
+                    <div class="alert alert-danger" >
+                        parent task start date {{pTaskStartDate}} should be prior to task start date.    
+                     </div>
+                     
+                  </div>
+            </div>
+            <div class="form-group row" style="padding-left:1rem;" *ngIf="isValidationEndDateError">
+                <div class="col-5 offset-2" >
+                    <div class="alert alert-danger" >
+                        parent task end date {{pTaskEnddate}} should be greater tahn task end date.    
+                     </div>
+                     
+                  </div>
+            </div>
             
          <div class="form-group row" style="padding-left:1rem;">
            <label for="inputTask" class="control-label col-2" style="text-align: left">Task:</label>

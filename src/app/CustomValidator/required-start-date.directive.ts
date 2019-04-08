@@ -18,13 +18,13 @@ export const StartEndDateComparisonValidator: ValidatorFn = (control: FormGroup)
   
   const stdate = control.get('startdate');
   const endate = control.get('enddate');
-  if(stdate !=null && endate !=null)
+  if(endate !=null)
   {
     if (endate.value==null || endate.value==='')
          return null;
     else{
     
-      if(stdate.value>endate.value)
+      if(stdate==null || stdate.value==='' || stdate.value>endate.value)
       {
         return {appStartEndDateComparison:{valid:false}};
       }

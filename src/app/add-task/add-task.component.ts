@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 
+import {Observable} from "rxjs/index";
+import { Http, Request, RequestOptions, RequestOptionsArgs, Response, XHRBackend } from "@angular/http";
+import {TaskManagerServiceService} from '../task-manager-service.service';
 import{Task} from '../task'
+import { error } from '@angular/compiler/src/util';
+import { modelGroupProvider } from '@angular/forms/src/directives/ng_model_group';
 
 @Component({
   selector: 'app-add-task',
@@ -9,21 +14,94 @@ import{Task} from '../task'
 })
 export class AddTaskComponent implements OnInit {
   
-  startEndDate:Date=new Date();
-  Tasks:Task[];
-   dateString = '1018-11-16T00:00:00' 
-   newDate = new Date(this.dateString);
+   startEndDate:Date=new Date();
+   ParentTasks:Task[];
    model:Task=new Task();
-  constructor() {
+   isError:boolean=false;
+   isValidationStDateError=false;
+   isValidationEndDateError=false;
+   errorMsg:string;
+   isSuccess:boolean=false;
+   successMsg:string;
+   pTaskStartDate:Date;
+   pTaskEnddate:Date;
+   constructor(private taskManagerService: TaskManagerServiceService) {
     this.startEndDate.setDate( this.startEndDate.getDate() + 1);
     
    }
 
   ngOnInit() {
+    this.GetAllParentTask();
     
   }
   onSubmit(){
+      let allowSubmit=true;
+      if (this.model.ParentTaskId >0)
+      {
+         var pTask=this.ParentTasks.filter(item=>item.TaskId===this.model.ParentTaskId);
+         var compareResult=this.ComapareAgainstParenttask(pTask[0]);
+         allowSubmit=compareResult;
+      }
+      if(allowSubmit)
+      {
+        this.AddTask();
+        
+      }
   
+
+  }
+  ComapareAgainstParenttask(task:Task):boolean{
+    let rtValue=true;
+    if (task.StartDate>this.model.StartDate)
+    {
+      rtValue=false;
+      this.isValidationStDateError=true;
+      this.pTaskStartDate=task.StartDate;
+
+    }
+    if (task.EndDate!=null && task.EndDate<this.model.EndDate)
+    {
+      rtValue=false;
+      this.isValidationEndDateError=true;
+      this.pTaskEnddate=task.EndDate;
+
+    }
+    return rtValue;
+  }
+  GetAllParentTask(){
+    this.taskManagerService.GetAllParentTask().subscribe(data=>this.ParentTasks=data,(error:any)=>this.HandleError(error,"GetAllParentTask"));
+       
+  }
+  AddTask()
+  {
+    this.taskManagerService.Addtask(this.model).subscribe(data=>{
+      this.isSuccess=true;
+      this.successMsg="Task has been added successfully";
+      this.GetAllParentTask();
+    },
+      (error:Error)=>this.HandleError(error,"AddTask"));
+  }
+  HandleError(err:any,orgOfError:string)
+  {
+    if((err.status===500|| err.status===0) && orgOfError==='GetAllParentTask')
+    {
+      this.isError=true;
+      this.errorMsg="Pernt task loading failed";
+
+    }
+    if((err.status===500|| err.status===0) && orgOfError==='AddTask')
+    {
+      this.isError=true;
+      this.errorMsg="Task addition failed, please try again later";
+
+    }
+    if(err.status===400 && orgOfError==='AddTask')
+    {
+      this.isError=true;
+      this.errorMsg="Active task with same "+ this.model.TaskName +" name is already present in the system";
+
+    }
+   
 
   }
 

@@ -17,7 +17,7 @@ export class TaskManagerServiceService {
 
   constructor(private http:HttpClient) { }
  
-  GetAllTask1():Observable<any>{
+  GetAllTask():Observable<any>{
     let params = new HttpParams();
     params = params.append('isParentonly', 'false');
     return this.http.get<any>(this.TaskManagerApiUrl,{params: params}).pipe(
@@ -37,19 +37,16 @@ export class TaskManagerServiceService {
      
       
   GetAllParentTask():Observable<any>{
-    let params = new HttpParams();
-    params = params.append('isParentonly', 'true');
-    return this.http.get<any>(this.TaskManagerApiUrl,{params: params}).pipe(
+    const params = new HttpParams()
+    .set('isParentonly', 'true');
+    
+    return this.http.get<any>(this.TaskManagerApiUrl,{params}).pipe(
       map((res:Response)=>{
        
         if(res.status===200)
          return res.json();
       })
-      ,catchError((err:any)=>{
-        
-        return Observable.throw(new Error(err.status));
-        
-      })
+     
     );
   }
   Addtask(value:Task):Observable<any>{
@@ -59,11 +56,7 @@ export class TaskManagerServiceService {
         if(res.status===200)
          return res.json();
       })
-      ,catchError((err:any)=>{
-        
-        return Observable.throw(new Error(err.status));
-        
-      })
+      
     );
 
   }
