@@ -18,8 +18,8 @@ export class AddTaskComponent implements OnInit {
    ParentTasks:Task[];
    model:Task=new Task();
    isError:boolean=false;
-   isValidationStDateError=false;
-   isValidationEndDateError=false;
+   isValidationStDateError:boolean=false;
+   isValidationEndDateError:boolean=false;
    errorMsg:string;
    isSuccess:boolean=false;
    successMsg:string;
@@ -35,7 +35,14 @@ export class AddTaskComponent implements OnInit {
     
   }
   onSubmit(){
+     this.isError=false;
+     this.isValidationStDateError=false;
+     this.isValidationEndDateError=false;
+     this.isSuccess=false;
+
       let allowSubmit=true;
+      
+      this.model.ParentTaskId=Number(this.model.ParentTaskId);
       if (this.model.ParentTaskId >0)
       {
          var pTask=this.ParentTasks.filter(item=>item.TaskId===this.model.ParentTaskId);
@@ -69,7 +76,22 @@ export class AddTaskComponent implements OnInit {
     return rtValue;
   }
   GetAllParentTask(){
-    this.taskManagerService.GetAllParentTask().subscribe(data=>this.ParentTasks=data,(error:any)=>this.HandleError(error,"GetAllParentTask"));
+    this.taskManagerService.GetAllParentTask().subscribe(data=>
+      {
+        this.ParentTasks=data;
+        var pTask=this.ParentTasks.filter(item=>item.TaskId==0);
+        if(pTask ==null || pTask.length==0)
+        {
+           var ts=new Task();
+           ts.TaskId =0;
+           ts.TaskName ="Choose Parent Task";
+           this.ParentTasks.push(ts);
+        }
+        
+        
+      },
+      (error:any)=>{this.HandleError(error,"GetAllParentTask")}
+      );
        
   }
   AddTask()

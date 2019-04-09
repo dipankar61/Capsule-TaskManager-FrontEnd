@@ -1,5 +1,5 @@
 export class Task {
-    TaskId:Number;
+    TaskId:Number=0;
     TaskName:String;
     StartDate:Date;
     EndDate:Date |null;
