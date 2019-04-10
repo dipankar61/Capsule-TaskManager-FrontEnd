@@ -19,22 +19,21 @@
                      
                   </div>
             </div>
-            <div class="form-group row" style="padding-left:1rem;" *ngIf="isValidationStDateError">
+            <div class="form-group row" style="padding-left:1rem;" *ngIf="isValidationStDateError || isValidationEndDateError || isValidationSteDateError ">
                 <div class="col-7" >
-                    <div class="alert alert-danger" >
-                        parent task start date {{pTaskStartDate}} should be prior to task start date.    
+                    <div class="alert alert-danger" *ngIf="isValidationStDateError">
+                        Parent task start date is {{pTaskStartDate|date:'shortDate'}}. Child task start date should be after that    
+                     </div>
+                     <div class="alert alert-danger" *ngIf="isValidationEndDateError">
+                        Parent task end date is {{pTaskEnddate|date:'shortDate'}}. Child task end date should be before that       
+                     </div>
+                     <div class="alert alert-danger" *ngIf="isValidationSteDateError">
+                        Parent task end date is {{pTaskStartDate|date:'shortDate'}}. Child task start date should be before that       
                      </div>
                      
                   </div>
             </div>
-            <div class="form-group row" style="padding-left:1rem;" *ngIf="isValidationEndDateError">
-                <div class="col-7" >
-                    <div class="alert alert-danger" >
-                        parent task end date {{pTaskEnddate}} should be greater tahn task end date.    
-                     </div>
-                     
-                  </div>
-            </div>
+            
             
          <div class="form-group row" style="padding-left:1rem;">
            <label for="inputTask" class="control-label col-2" style="text-align: left">Task:</label>
@@ -73,14 +72,15 @@
                       >
                         
                        
-                        <option *ngFor="let task of ParentTasks" [value]="task.TaskId" [selected]="task.TaskId===model.TaskId" >
+                     
+                     <option *ngFor="let task of ParentTasks" [value]="task.TaskId" [selected]="model.ParentTaskId==null||task.TaskId===model.ParentTaskId" >
                                       {{ task.TaskName }}
-                        </option>
+                     </option>
                        
                         
                       </select>
                       
-                      <div> {{model.TaskId}}</div>
+                     
 
                     </div>
                   </div>
@@ -134,7 +134,7 @@
                         <button type="submit" class="btn btn-light" [disabled]="!TaskForm.valid">AddTask</button>
                     </div>
                     <div class="col-1 ">
-                        <button type="button" class="btn btn-light">Reset</button>
+                        <button type="button" class="btn btn-light" (click)="ResetForm(TaskForm)">Reset</button>
                     </div>
                 </div>
               </div>

@@ -4,7 +4,7 @@ export class Task {
     StartDate:Date;
     EndDate:Date |null;
     Priority:Number;
-    ParentTaskId:Number |null;
+    ParentTaskId:Number;
     ParentTaskName:String|null;
     
     

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
+import { NgForm } from '@angular/forms';
 import {Observable} from "rxjs/index";
 import { Http, Request, RequestOptions, RequestOptionsArgs, Response, XHRBackend } from "@angular/http";
 import {TaskManagerServiceService} from '../task-manager-service.service';
@@ -13,6 +13,7 @@ import { modelGroupProvider } from '@angular/forms/src/directives/ng_model_group
   styleUrls: ['./add-task.component.css']
 })
 export class AddTaskComponent implements OnInit {
+
   
    startEndDate:Date=new Date();
    ParentTasks:Task[];
@@ -20,6 +21,7 @@ export class AddTaskComponent implements OnInit {
    isError:boolean=false;
    isValidationStDateError:boolean=false;
    isValidationEndDateError:boolean=false;
+   isValidationSteDateError:boolean=false;
    errorMsg:string;
    isSuccess:boolean=false;
    successMsg:string;
@@ -31,6 +33,8 @@ export class AddTaskComponent implements OnInit {
    }
 
   ngOnInit() {
+    var a:Task;
+    a=this.model;
     this.GetAllParentTask();
     
   }
@@ -38,13 +42,15 @@ export class AddTaskComponent implements OnInit {
      this.isError=false;
      this.isValidationStDateError=false;
      this.isValidationEndDateError=false;
+     this.isValidationSteDateError=false
      this.isSuccess=false;
 
       let allowSubmit=true;
       
-      this.model.ParentTaskId=Number(this.model.ParentTaskId);
-      if (this.model.ParentTaskId >0)
+      
+      if (this.model.ParentTaskId !=null && this.model.ParentTaskId !=undefined)
       {
+        this.model.ParentTaskId=Number(this.model.ParentTaskId);
          var pTask=this.ParentTasks.filter(item=>item.TaskId===this.model.ParentTaskId);
          var compareResult=this.ComapareAgainstParenttask(pTask[0]);
          allowSubmit=compareResult;
@@ -57,8 +63,20 @@ export class AddTaskComponent implements OnInit {
   
 
   }
+  ResetForm(form: NgForm)
+  {
+     form.reset();
+    
+  }
   ComapareAgainstParenttask(task:Task):boolean{
     let rtValue=true;
+    
+    
+    task.StartDate=new Date(task.StartDate);
+    if(task.EndDate !=null && task.EndDate!=undefined)
+    {
+        task.EndDate=new Date(task.EndDate);
+    }
     if (task.StartDate>this.model.StartDate)
     {
       rtValue=false;
@@ -66,7 +84,14 @@ export class AddTaskComponent implements OnInit {
       this.pTaskStartDate=task.StartDate;
 
     }
-    if (task.EndDate!=null && task.EndDate<this.model.EndDate)
+    else if(task.EndDate!=null && task.EndDate <this.model.StartDate)
+    {
+      rtValue=false;
+      this.isValidationSteDateError=true;
+      this.pTaskStartDate=task.EndDate;
+
+    }
+    if (task.EndDate!=null && task.EndDate <this.model.EndDate)
     {
       rtValue=false;
       this.isValidationEndDateError=true;
@@ -79,16 +104,15 @@ export class AddTaskComponent implements OnInit {
     this.taskManagerService.GetAllParentTask().subscribe(data=>
       {
         this.ParentTasks=data;
-        var pTask=this.ParentTasks.filter(item=>item.TaskId==0);
+        var pTask=this.ParentTasks.filter(item=>item.TaskId==null);
         if(pTask ==null || pTask.length==0)
         {
            var ts=new Task();
-           ts.TaskId =0;
+           ts.TaskId =null;
            ts.TaskName ="Choose Parent Task";
            this.ParentTasks.push(ts);
         }
-        
-        
+       
       },
       (error:any)=>{this.HandleError(error,"GetAllParentTask")}
       );
