@@ -1,3 +1,56 @@
-<p>
-  view-task works!
-</p>
+<div class="Container" style="padding-top:.5rem;">
+    <div class="row">
+      <div class="col-9" style="padding-left:1rem;">
+       <form [formGroup]="searchForm" class="form-inline">
+        <div class="form-group w-100" >
+          
+            <label  style="text-align: left;width: 6%">Task:</label>
+            <input type="text" class="form-control" style="width: 36%" id="inputTask" formControlName="taskName"maxlength="20">
+            <label for="inputTaskParent" class="control-label"  style="text-align: left;width: 12%">Parent Task:</label>
+            <input type="text" class="form-control" style="width: 46%"  id="inputTaskParent" formControlName="taskParentName">
+            
+            
+          </div>
+          <div class="form-group w-100" style="padding-top:1rem;">
+              <label for="PrioFrom" style="text-align: left;width: 13%">Priority From:</label>
+               
+                 <input type="number" class="form-control" style="width: 9%" id="PrioFrom" formControlName="PriorityFrom">
+                  
+               
+               <label for="PrioTo" style="text-align: left;width:11%">Priority To:</label>
+               
+                 <input type="number" class="form-control" style="width: 9%" id="PrioTo" formControlName="PriorityTo">
+                  
+               
+               <label for="stDate" style="text-align: left;width:10%">Start Date:</label>
+               <div class="input-group" style="width: 19%">
+                     
+                  <input  class="form-control" matInput [matDatepicker]="startDate"  name="startdate" formControlName="startdate">
+                  <mat-datepicker-toggle matSuffix [for]="startDate"></mat-datepicker-toggle>
+                  <mat-datepicker #startDate></mat-datepicker>
+                  
+                  
+                 
+               </div>
+               <label for="enddate" style="text-align: left;width:10%">End Date:</label>
+               <div class="input-group " style="width: 19%">
+                     
+                  <input  class="form-control" matInput [matDatepicker]="enddate"   formControlName="enddate">
+                  <mat-datepicker-toggle matSuffix [for]="enddate"></mat-datepicker-toggle>
+                  <mat-datepicker #enddate></mat-datepicker>
+                  
+                  
+                 
+               </div>
+               
+                  
+               
+            </div>
+  
+        </form>
+        <hr style="border-top: dotted 1px;" />
+       </div>
+    </div>
+  
+  </div>
+  
