@@ -65,6 +65,11 @@ export class AddTaskComponent implements OnInit {
   }
   ResetForm(form: NgForm)
   {
+     this.isError=false;
+     this.isValidationStDateError=false;
+     this.isValidationEndDateError=false;
+     this.isValidationSteDateError=false
+     this.isSuccess=false;
      form.reset();
     
   }

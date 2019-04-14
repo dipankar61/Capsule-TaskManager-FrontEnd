@@ -19,7 +19,7 @@ export class TaskManagerServiceService {
  
   GetAllTask():Observable<Task[]>{
     const params = new HttpParams()
-    .set('isParentonly', 'true');
+    .set('isParentonly', 'false');
     
     return this.http.get<Task[]>(this.TaskManagerApiUrl,{params});
   }
