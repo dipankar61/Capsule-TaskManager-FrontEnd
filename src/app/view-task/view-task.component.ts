@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef, ElementRef,AfterViewInit } from '@angular/core';
 import {
   FormGroup,
   Validators,
@@ -18,27 +18,32 @@ import {MatTableDataSource,MatSort,MatPaginator} from '@angular/material';
   templateUrl: './view-task.component.html',
   styleUrls: ['./view-task.component.css']
 })
-export class ViewTaskComponent implements OnInit {
+export class ViewTaskComponent implements OnInit,AfterViewInit {
   isError:boolean=false;
   searchForm: FormGroup;
   Tasks:Task[];
-  //dataSource = new MatTableDataSource<Task>(this.Tasks);
   dataSource : MatTableDataSource<Task>;
-  //@ViewChild(MatPaginator) paginator: MatPaginator;
-  //@ViewChild(MatSort) sort: MatSort;
-  
+  today:Date=new Date();
+  @ViewChild('erDiv') errorDiv: ElementRef;
+
  displayedColumns: string[] = ['TaskName', 'ParentTaskName', 'Priority', 'StartDate','EndDate','customColumn1','customColumn2'];
 
  errorMsg:string;
- //dataSource:TaskdataSource;
+ filterValues = {
+  nameTask: '',
+  pTask: '',
+  PrioFrom: '',
+  PrioTo: '',
+  stDate:'',
+  enDate:''
+ }
+
 
 
   constructor(private ref: ChangeDetectorRef,private formBuilder: FormBuilder,private taskManagerService: TaskManagerServiceService) {
      
-      //var displayedColumns: string[] = ['TaskId'];
-      //this.Tasks=[];
       this.GetAllTask();
-      //this.ref.markForCheck();
+     
    }
 
   ngOnInit() {
@@ -54,7 +59,54 @@ export class ViewTaskComponent implements OnInit {
     }
 
     );
+    this.TrackValueChange();
     
+    
+  }
+  TrackValueChange(){
+    this.searchForm.get('taskName').valueChanges
+  .subscribe(
+    tname => {
+      this.filterValues.nameTask = tname;
+      this.dataSource.filter = JSON.stringify(this.filterValues);
+    }
+  )
+  this.searchForm.get('taskParentName').valueChanges
+  .subscribe(
+    ptname => {
+      this.filterValues.pTask = ptname;
+      this.dataSource.filter = JSON.stringify(this.filterValues);
+    }
+  )
+  this.searchForm.get('PriorityFrom').valueChanges
+  .subscribe(
+    pfrom => {
+      this.filterValues.PrioFrom = pfrom;
+      this.dataSource.filter = JSON.stringify(this.filterValues);
+    }
+  )
+  this.searchForm.get('PriorityTo').valueChanges
+  .subscribe(
+    pto => {
+      this.filterValues.PrioTo= pto;
+      this.dataSource.filter = JSON.stringify(this.filterValues);
+    }
+  )
+  this.searchForm.get('startdate').valueChanges
+  .subscribe(
+    sdate => {
+      this.filterValues.stDate = sdate;
+      this.dataSource.filter = JSON.stringify(this.filterValues);
+    }
+  )
+  this.searchForm.get('enddate').valueChanges
+  .subscribe(
+    edate => {
+      this.filterValues.enDate = edate;
+      this.dataSource.filter = JSON.stringify(this.filterValues);
+    }
+  )
+  
   }
   GetAllTask(){
     this.taskManagerService.GetAllTask().subscribe(data=>
@@ -63,26 +115,96 @@ export class ViewTaskComponent implements OnInit {
         
         if(this.Tasks)
         {
-        //this.dataSource.data=this.Tasks;
+       
          this.dataSource = new MatTableDataSource(this.Tasks);
-        //this.dataSource.data=this.Tasks;
-        //this.dataSource.paginator = this.paginator;
-        //this.dataSource.sort = this.sort;
-        this.ref.markForCheck();
+         this.dataSource.filterPredicate = this.ApplyFilter();
+         //this.ref.markForCheck();
         }
-        //console.log(this.dataSource.data[0].TaskId);
+       
        
       },
       (error:any)=>{this.HandleError(error,"GetAllTask")}
       );
        
   }
+
+  ApplyFilter(): (data: any, filter: string) => boolean {
+    let filterFunction = function(data, filter): boolean {
+      this.isError=false;
+      
+      let searchTerms = JSON.parse(filter);
+      data.StartDate=new Date(data.StartDate);
+      if(data.EndDate !=null && data.EndDate!=undefined)
+      {
+        data.EndDate=new Date(data.EndDate);
+       }
+     
+       if ((data.TaskName.toLowerCase().indexOf(searchTerms.nameTask.toLowerCase()) !== -1) && ((searchTerms.pTask==="") ||
+          (data.ParentTaskName!==null && data.ParentTaskName.toLowerCase().indexOf(searchTerms.pTask.toLowerCase()) !== -1))
+          &&
+          ((searchTerms.PrioFrom==="" || searchTerms.PrioFrom===null) || (data.Priority>=searchTerms.PrioFrom))
+          &&
+          ((searchTerms.PrioTo==="" || searchTerms.PrioTo===null) || (data.Priority<=searchTerms.PrioTo))
+          &&
+          ((searchTerms.stDate==="" || searchTerms.stDate===null) || (data.StartDate>=new Date(searchTerms.stDate)))
+          &&
+          ((searchTerms.enDate==="" || searchTerms.enDate===null) || (data.EndDate !==null && data.EndDate<=new Date(searchTerms.enDate)))
+          
+          )
+          return true;
+        else
+          return false;
+
+    
+     
+      
+    }
+    return filterFunction;
+  }
+  ngAfterViewInit()
+  {
+    if(!this.isError)
+     this.errorDiv.nativeElement.style.display='none';
+     
+  }
   EndTask(t:Task)
   {
-    this.taskManagerService.EditTask(t).subscribe(data=>{
+    this.isError=false;
+    
+    var previousEndDate=t.EndDate;
+    var stDate=new Date(t.StartDate);
+    if(stDate<this.today)
+    {
+      t.EndDate=new Date();
+      this.taskManagerService.EditTask(t).subscribe(data=>{
+     
       
-    },
-      (error:Error)=>this.HandleError(error,"EndTask"));
+       },
+      (error:Error)=>{
+        t.EndDate=previousEndDate;
+        this.HandleError(error,"EndTask")
+      });
+    }
+    else{
+      this.isError=true;
+      this.errorMsg="Task end date must be greater than start date ";
+
+    }
+  }
+  DisableButton(t:Task):boolean{
+    if(t.EndDate !=null && t.EndDate!=undefined)
+    {
+        t.EndDate=new Date(t.EndDate);
+        if(t.EndDate<=this.today)
+        {
+          return true;
+        }
+    }
+    else{
+      return false
+    }
+     
+
   }
   HandleError(err:any,orgOfError:string)
   {

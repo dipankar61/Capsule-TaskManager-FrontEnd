@@ -33,8 +33,7 @@ export class AddTaskComponent implements OnInit {
    }
 
   ngOnInit() {
-    var a:Task;
-    a=this.model;
+    
     this.GetAllParentTask();
     
   }
