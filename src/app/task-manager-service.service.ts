@@ -23,6 +23,12 @@ export class TaskManagerServiceService {
     
     return this.http.get<Task[]>(this.TaskManagerApiUrl,{params});
   }
+  GetTask(id:string):Observable<Task>{
+    const params = new HttpParams()
+    .set('Id', id);
+    
+    return this.http.get<Task>(this.TaskManagerApiUrl,{params});
+  }
       
      
       

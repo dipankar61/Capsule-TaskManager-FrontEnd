@@ -12,13 +12,14 @@ import { error } from '@angular/compiler/src/util';
 //import {DataSource} from '@angular/cdk/collections';
 import { merge } from 'rxjs/operators';
 import {MatTableDataSource,MatSort,MatPaginator} from '@angular/material';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-view-task',
   templateUrl: './view-task.component.html',
   styleUrls: ['./view-task.component.css']
 })
-export class ViewTaskComponent implements OnInit,AfterViewInit {
+export class ViewTaskComponent implements OnInit {
   isError:boolean=false;
   searchForm: FormGroup;
   Tasks:Task[];
@@ -40,7 +41,8 @@ export class ViewTaskComponent implements OnInit,AfterViewInit {
 
 
 
-  constructor(private ref: ChangeDetectorRef,private formBuilder: FormBuilder,private taskManagerService: TaskManagerServiceService) {
+  constructor(private ref: ChangeDetectorRef,private formBuilder: FormBuilder,private taskManagerService: TaskManagerServiceService,
+    private router: Router) {
      
       this.GetAllTask();
      
@@ -161,12 +163,7 @@ export class ViewTaskComponent implements OnInit,AfterViewInit {
     }
     return filterFunction;
   }
-  ngAfterViewInit()
-  {
-    if(!this.isError)
-     this.errorDiv.nativeElement.style.display='none';
-     
-  }
+  
   EndTask(t:Task)
   {
     this.isError=false;
@@ -191,11 +188,16 @@ export class ViewTaskComponent implements OnInit,AfterViewInit {
 
     }
   }
+  EditTask(t:Task){
+    this.router.navigate(['/AddTask', { Id: t.TaskId}]);
+
+  }
   DisableButton(t:Task):boolean{
     if(t.EndDate !=null && t.EndDate!=undefined)
     {
-        t.EndDate=new Date(t.EndDate);
-        if(t.EndDate<=this.today)
+        var edate=new Date(t.EndDate);
+        //t.EndDate=new Date(t.EndDate);
+        if(edate<=this.today)
         {
           return true;
         }

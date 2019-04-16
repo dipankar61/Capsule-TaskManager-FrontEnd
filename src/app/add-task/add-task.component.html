@@ -129,7 +129,7 @@
                          
                       </div>
                 </div>
-                 <div class="form-group row" style="padding-left:1rem;">
+                 <div class="form-group row" style="padding-left:1rem;" *ngIf="!isEditMode">
                     <div class="col-1 offset-2 ">
                         <button type="submit" class="btn btn-light" [disabled]="!TaskForm.valid">AddTask</button>
                     </div>
@@ -137,6 +137,14 @@
                         <button type="button" class="btn btn-light" (click)="ResetForm(TaskForm)">Reset</button>
                     </div>
                 </div>
+                <div class="form-group row" style="padding-left:1rem;" *ngIf="isEditMode">
+                  <div class="col-1 offset-2 ">
+                      <button type="submit" class="btn btn-light" [disabled]="!TaskForm.valid">Update</button>
+                  </div>
+                  <div class="col-1 ">
+                      <button type="button" class="btn btn-light" (click)="CancelEdit()">Cancel</button>
+                  </div>
+              </div>
               </div>
         </form>
       

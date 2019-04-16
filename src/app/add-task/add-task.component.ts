@@ -6,6 +6,7 @@ import {TaskManagerServiceService} from '../task-manager-service.service';
 import{Task} from '../task'
 import { error } from '@angular/compiler/src/util';
 import { modelGroupProvider } from '@angular/forms/src/directives/ng_model_group';
+import { ActivatedRoute,Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-task',
@@ -14,7 +15,8 @@ import { modelGroupProvider } from '@angular/forms/src/directives/ng_model_group
 })
 export class AddTaskComponent implements OnInit {
 
-  
+   editTaskID:string;
+   isEditMode:boolean=false;
    startEndDate:Date=new Date();
    ParentTasks:Task[];
    model:Task=new Task();
@@ -27,14 +29,21 @@ export class AddTaskComponent implements OnInit {
    successMsg:string;
    pTaskStartDate:Date;
    pTaskEnddate:Date;
-   constructor(private taskManagerService: TaskManagerServiceService) {
+   constructor(private taskManagerService: TaskManagerServiceService,private route: ActivatedRoute,private router: Router) {
     this.startEndDate.setDate( this.startEndDate.getDate() + 1);
     
    }
 
   ngOnInit() {
-    
     this.GetAllParentTask();
+    this.editTaskID = this.route.snapshot.params.Id;
+    if(this.editTaskID!==undefined && this.editTaskID!==null)
+    {
+       this.isEditMode=true;
+       this.GetTaskById()
+    }
+    
+    
     
   }
   onSubmit(){
@@ -56,7 +65,13 @@ export class AddTaskComponent implements OnInit {
       }
       if(allowSubmit)
       {
-        this.AddTask();
+        if(this.editTaskID!==undefined && this.editTaskID!==null)
+        {
+          this.EditTask();
+        }
+        else{
+           this.AddTask();
+        }
         
       }
   
@@ -71,6 +86,10 @@ export class AddTaskComponent implements OnInit {
      this.isSuccess=false;
      form.reset();
     
+  }
+  CancelEdit()
+  {
+    this.router.navigate(['/ViewTask']);
   }
   ComapareAgainstParenttask(task:Task):boolean{
     let rtValue=true;
@@ -95,7 +114,7 @@ export class AddTaskComponent implements OnInit {
       this.pTaskStartDate=task.EndDate;
 
     }
-    if (task.EndDate!=null && task.EndDate <this.model.EndDate)
+    if (task.EndDate!=null && (this.model.EndDate===null || this.model.EndDate===undefined))
     {
       rtValue=false;
       this.isValidationEndDateError=true;
@@ -122,6 +141,16 @@ export class AddTaskComponent implements OnInit {
       );
        
   }
+  GetTaskById(){
+    this.taskManagerService.GetTask(this.editTaskID).subscribe(data=>
+      {
+        this.model=data;
+               
+      },
+      (error:any)=>{this.HandleError(error,"GetTaskById")}
+      );
+       
+  }
   AddTask()
   {
     this.taskManagerService.Addtask(this.model).subscribe(data=>{
@@ -131,24 +160,43 @@ export class AddTaskComponent implements OnInit {
     },
       (error:Error)=>this.HandleError(error,"AddTask"));
   }
+  EditTask()
+  {
+    this.taskManagerService.EditTask(this.model).subscribe(data=>{
+      this.isSuccess=true;
+      this.successMsg="Task has been updated successfully";
+      
+    },
+      (error:Error)=>this.HandleError(error,"EditTask"));
+  }
   HandleError(err:any,orgOfError:string)
   {
-    if((err.status===500|| err.status===0) && orgOfError==='GetAllParentTask')
+    if((err.status===500|| err.status===0) && (orgOfError==='GetAllParentTask' || orgOfError==='GetTaskById'))
     {
       this.isError=true;
-      this.errorMsg="Pernt task loading failed";
+      orgOfError==='GetAllParentTask'?this.errorMsg="Pernt task loading failed":this.errorMsg="Task retrieve failed";
 
     }
-    if((err.status===500|| err.status===0) && orgOfError==='AddTask')
+    if((err.status===500|| err.status===0) && (orgOfError==='AddTask'|| orgOfError==='EditTask'))
     {
       this.isError=true;
-      this.errorMsg="Task addition failed, please try again later";
+      orgOfError==='AddTask'?this.errorMsg="Task addition failed, please try again later":this.errorMsg="Update failed, please try again later";
 
     }
-    if(err.status===400 && orgOfError==='AddTask')
+    if(err.status===400 && (orgOfError==='AddTask'|| orgOfError==='EditTask'))
     {
       this.isError=true;
-      this.errorMsg="Active task with same "+ this.model.TaskName +" name is already present in the system";
+      if(orgOfError==='AddTask'){
+        this.errorMsg="Active task with same "+ this.model.TaskName +" name is already present in the system";
+      }
+      else{
+        if(err.error.ModelState.TaskName!==undefined){
+          this.errorMsg=err.error.ModelState.TaskName[0];
+        }
+        else{
+        this.errorMsg="Task update request rejected due to one or more validation failed";
+        }
+      }
 
     }
    
