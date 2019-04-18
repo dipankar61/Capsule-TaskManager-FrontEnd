@@ -8,6 +8,7 @@ import { error } from '@angular/compiler/src/util';
 import { modelGroupProvider } from '@angular/forms/src/directives/ng_model_group';
 import { ActivatedRoute,Router } from '@angular/router';
 
+
 @Component({
   selector: 'app-add-task',
   templateUrl: './add-task.component.html',
@@ -19,7 +20,8 @@ export class AddTaskComponent implements OnInit {
    isEditMode:boolean=false;
    startEndDate:Date=new Date();
    ParentTasks:Task[];
-   model:Task=new Task();
+   //model:Task=new Task();
+   model:Task;
    isError:boolean=false;
    isValidationStDateError:boolean=false;
    isValidationEndDateError:boolean=false;
@@ -36,12 +38,21 @@ export class AddTaskComponent implements OnInit {
 
   ngOnInit() {
     this.GetAllParentTask();
-    this.editTaskID = this.route.snapshot.params.Id;
-    if(this.editTaskID!==undefined && this.editTaskID!==null)
-    {
+    this.route.params.subscribe((data) => {
+      this.editTaskID = data.Id;
+      if(this.editTaskID!==undefined && this.editTaskID!==null)
+      {
        this.isEditMode=true;
        this.GetTaskById()
-    }
+      }
+      else{
+        this.isEditMode=false;
+        this.model=new Task();
+      }
+      //this.changeDetector.detectChanges();
+     } );
+    //this.editTaskID = this.route.snapshot.params.Id;
+    
     
     
     
@@ -84,7 +95,7 @@ export class AddTaskComponent implements OnInit {
      this.isValidationEndDateError=false;
      this.isValidationSteDateError=false
      this.isSuccess=false;
-     form.reset();
+      form.reset();
     
   }
   CancelEdit()

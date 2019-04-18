@@ -69,6 +69,7 @@ export class ViewTaskComponent implements OnInit {
     this.searchForm.get('taskName').valueChanges
   .subscribe(
     tname => {
+      this.isError=false;
       this.filterValues.nameTask = tname;
       this.dataSource.filter = JSON.stringify(this.filterValues);
     }
@@ -76,6 +77,7 @@ export class ViewTaskComponent implements OnInit {
   this.searchForm.get('taskParentName').valueChanges
   .subscribe(
     ptname => {
+      this.isError=false;
       this.filterValues.pTask = ptname;
       this.dataSource.filter = JSON.stringify(this.filterValues);
     }
@@ -83,6 +85,7 @@ export class ViewTaskComponent implements OnInit {
   this.searchForm.get('PriorityFrom').valueChanges
   .subscribe(
     pfrom => {
+      this.isError=false;
       this.filterValues.PrioFrom = pfrom;
       this.dataSource.filter = JSON.stringify(this.filterValues);
     }
@@ -90,6 +93,7 @@ export class ViewTaskComponent implements OnInit {
   this.searchForm.get('PriorityTo').valueChanges
   .subscribe(
     pto => {
+      this.isError=false;
       this.filterValues.PrioTo= pto;
       this.dataSource.filter = JSON.stringify(this.filterValues);
     }
@@ -97,6 +101,7 @@ export class ViewTaskComponent implements OnInit {
   this.searchForm.get('startdate').valueChanges
   .subscribe(
     sdate => {
+      this.isError=false;
       this.filterValues.stDate = sdate;
       this.dataSource.filter = JSON.stringify(this.filterValues);
     }
@@ -104,6 +109,7 @@ export class ViewTaskComponent implements OnInit {
   this.searchForm.get('enddate').valueChanges
   .subscribe(
     edate => {
+      this.isError=false;
       this.filterValues.enDate = edate;
       this.dataSource.filter = JSON.stringify(this.filterValues);
     }
@@ -132,7 +138,7 @@ export class ViewTaskComponent implements OnInit {
 
   ApplyFilter(): (data: any, filter: string) => boolean {
     let filterFunction = function(data, filter): boolean {
-      this.isError=false;
+      //this.isError=false;
       
       let searchTerms = JSON.parse(filter);
       data.StartDate=new Date(data.StartDate);
