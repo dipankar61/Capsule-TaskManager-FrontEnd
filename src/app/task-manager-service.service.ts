@@ -4,12 +4,15 @@ import { Http, Request, RequestOptions, RequestOptionsArgs, Response, XHRBackend
 import { catchError, map, tap} from 'rxjs/operators';
 import {Observable} from "rxjs/index";
 import{Task} from './task';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TaskManagerServiceService {
   TaskManagerApiUrl:string="http://localhost:8080/api/TaskManager";
+  //TaskManagerApiUrl:string=environment.baseUrl;
+  
   tasks:Task[];
 
 

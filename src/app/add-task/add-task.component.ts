@@ -39,6 +39,7 @@ export class AddTaskComponent implements OnInit {
   ngOnInit() {
     this.GetAllParentTask();
     this.route.params.subscribe((data) => {
+     
       this.editTaskID = data.Id;
       if(this.editTaskID!==undefined && this.editTaskID!==null)
       {
